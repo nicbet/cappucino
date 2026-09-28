@@ -105,7 +105,7 @@ struct PopoverView: View {
                 Label("Sleep Displays Now", systemImage: "display")
                     .frame(maxWidth: .infinity)
             }
-            .controlSize(.regular)
+            .controlSize(.large)
             .help("Turn the displays off now. Your Mac and agents keep running.")
 
             ForEach(manager.displayBlockers) { blocker in

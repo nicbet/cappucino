@@ -199,7 +199,8 @@ final class AwakeManager: ObservableObject {
         let remaining = max(0, Int(end.timeIntervalSince(now)))
         let hours = remaining / 3600
         let minutes = (remaining % 3600) / 60
-        return hours > 0 ? "\(hours)h\(String(format: "%02d", minutes))" : "\(max(minutes, 1))m"
+        // Constant-width h:mm so the status item doesn't resize as it counts down.
+        return String(format: "%d:%02d", hours, minutes)
     }
 
     static func format(_ interval: TimeInterval) -> String {
