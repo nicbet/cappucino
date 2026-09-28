@@ -60,4 +60,4 @@ Every 5 seconds Cappucino scans the process table for the configured names. Agen
 
 ## License
 
-MIT
+MIT. Menu bar icons are from [Phosphor Icons](https://phosphoricons.com) (MIT), see [THIRD_PARTY_NOTICES.md](THIRD_PARTY_NOTICES.md).
