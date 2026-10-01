@@ -1,7 +1,6 @@
 import SwiftUI
 import AppKit
 
-@main
 struct CappucinoApp: App {
     @StateObject private var manager = AwakeManager()
 

@@ -53,12 +53,15 @@ final class AwakeManager: ObservableObject {
     }
 
     private let defaults = UserDefaults.standard
+    /// False for a snapshot: nothing is scanned, held or saved.
+    private let isLive: Bool
     private let systemAssertion = PowerAssertion(type: .preventIdleSystemSleep)
     private let displayAssertion = PowerAssertion(type: .preventIdleDisplaySleep)
     private var timer: Timer?
     private var ticks = 0
 
     init() {
+        isLive = true
         defaults.register(defaults: [
             Keys.baseline: Baseline.agents.rawValue,
             Keys.letDisplaysSleep: true,
@@ -75,6 +78,34 @@ final class AwakeManager: ObservableObject {
         timer = Timer.scheduledTimer(withTimeInterval: 5, repeats: true) { [weak self] _ in
             MainActor.assumeIsolated { self?.tick() }
         }
+    }
+
+    /// A manager frozen in the given state, for rendering snapshots.
+    init(snapshot state: SnapshotState) {
+        isLive = false
+        baseline = state.baseline
+        letDisplaysSleep = state.letDisplaysSleep
+        lingerMinutes = state.lingerMinutes
+        agentNames = AgentDetector.defaultAgents
+        manualTimer = state.manualTimer
+        runningAgents = state.runningAgents
+        lingerUntil = state.lingerUntil
+        displayBlockers = state.displayBlockers
+        power = state.power
+        launchAtLogin = state.launchAtLogin
+        isAwake = awakeReason != nil
+    }
+
+    struct SnapshotState {
+        var baseline = Baseline.agents
+        var manualTimer: ManualTimer?
+        var runningAgents: [String] = []
+        var lingerUntil: Date?
+        var displayBlockers: [DisplayBlocker] = []
+        var power = PowerSettings(systemSleep: 10, displaySleep: 10)
+        var letDisplaysSleep = true
+        var lingerMinutes = 5
+        var launchAtLogin = true
     }
 
     // MARK: Actions
@@ -100,6 +131,7 @@ final class AwakeManager: ObservableObject {
     }
 
     func refreshPowerInfo() {
+        guard isLive else { return }
         power = DisplayPower.settings()
         displayBlockers = DisplayPower.blockers()
     }
@@ -120,6 +152,7 @@ final class AwakeManager: ObservableObject {
     // MARK: Evaluation
 
     private func tick() {
+        guard isLive else { return }
         now = Date()
 
         if case .until(let end, _) = manualTimer, end <= now {

@@ -6,6 +6,11 @@ A macOS menu bar app that keeps your Mac awake while AI agents work, and still l
 ![Swift 5.9](https://img.shields.io/badge/Swift-5.9-orange)
 ![License: MIT](https://img.shields.io/badge/License-MIT-green)
 
+<picture>
+  <source media="(prefers-color-scheme: dark)" srcset="docs/popover-agents-dark.webp">
+  <img src="docs/popover-agents-light.webp" alt="Cappucino's popover under its menu bar cup: keeping the Mac awake while claude and codex run">
+</picture>
+
 ## Features
 
 - **System awake, displays asleep.** Holds a `PreventUserIdleSystemSleep` power assertion (the same thing `caffeinate -i` uses). The Mac won't idle-sleep, but your normal display-sleep timer still applies.
@@ -32,16 +37,18 @@ make install   # copies to /Applications
 make run       # builds and launches
 ```
 
+The screenshots in `docs/` are rendered by the app itself from preset states (`make screenshots`, needs `cwebp` from `brew install webp`). `make snapshot` renders every state, light and dark, to `.build/snapshots/`.
+
 ## How It Works
 
 ### Keeping awake
 
 macOS has separate assertions for system sleep and display sleep. Cappucino only takes the system one:
 
-| Assertion                     | Cappucino | Effect                                    |
-| ----------------------------- | --------- | ----------------------------------------- |
-| `PreventUserIdleSystemSleep`  | ✅ held    | Mac stays awake, agents keep running      |
-| `PreventUserIdleDisplaySleep` | only if "Let displays sleep" is off | Displays stay on too |
+| Assertion                     | Cappucino                           | Effect                               |
+| ----------------------------- | ----------------------------------- | ------------------------------------ |
+| `PreventUserIdleSystemSleep`  | ✅ held                             | Mac stays awake, agents keep running |
+| `PreventUserIdleDisplaySleep` | only if "Let displays sleep" is off | Displays stay on too                 |
 
 You can see what Cappucino is doing and why with:
 

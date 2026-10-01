@@ -1,4 +1,4 @@
-.PHONY: build icon bundle install run clean
+.PHONY: build icon bundle install run snapshot screenshots clean
 
 APP_NAME := Cappucino
 BUNDLE := Cappucino.app
@@ -36,6 +36,18 @@ install: bundle
 
 run: bundle
 	open "$(BUNDLE)"
+
+# Render the popover and Settings, light and dark, to .build/snapshots/*.png
+snapshot: build
+	"$(BUILD_DIR)/Cappucino" --snapshot .build/snapshots
+
+# Refresh the README screenshots in docs/ from the snapshots (needs cwebp: brew install webp)
+SCREENSHOTS := popover-agents popover-timer popover-burn-in settings
+screenshots: snapshot
+	@for name in $(SCREENSHOTS); do for theme in light dark; do \
+		cwebp -quiet -q 92 -m 6 -exact ".build/snapshots/$$name-$$theme.png" -o "docs/$$name-$$theme.webp"; \
+	done; done
+	@ls -l docs
 
 clean:
 	swift package clean
