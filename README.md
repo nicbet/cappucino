@@ -68,3 +68,10 @@ Every 5 seconds Cappucino scans the process table for the configured names. Agen
 ## License
 
 MIT. Menu bar icons are from [Phosphor Icons](https://phosphoricons.com) (MIT), see [THIRD_PARTY_NOTICES.md](THIRD_PARTY_NOTICES.md).
+
+## Trademarks
+
+Claude and Claude Code are trademarks or registered trademarks of Anthropic, PBC. OpenAI and Codex
+are trademarks or registered trademarks of OpenAI. The other agent names listed above are
+trademarks of their respective owners. Cappucino is an independent project and is not affiliated
+with, endorsed by or sponsored by any of them.
