@@ -24,20 +24,46 @@ A macOS menu bar app that keeps your Mac awake while AI agents work, and still l
 - **Launch at login.**
 - **Nothing to configure.** No accounts, no network access, no root.
 
-## Prerequisites
+## Requirements
 
 - macOS 14.0+
-- Xcode 26+ (for `swift` and `actool`, which compiles the Icon Composer app icon)
 
-## Build & Install
+## Building it yourself
+
+There are no prebuilt downloads: you build Cappucino from source. You don't need an Apple Developer account. Dev dependencies:
+
+- Xcode 26+, for `swift`, `codesign` and `actool`, which compiles the Icon Composer app icon (the Command Line Tools alone don't include `actool`)
+- Optional: `cwebp` (`brew install webp`), only for `make screenshots`
+
+```bash
+git clone https://github.com/nicbet/cappucino.git
+cd cappucino
+make signing-cert   # once: create a local code-signing certificate (see below)
+make install        # build the release app and copy it to /Applications
+```
+
+The other tasks:
 
 ```bash
 make bundle    # builds release binary + .app bundle
-make install   # copies to /Applications
 make run       # builds and launches
 ```
 
-The screenshots in `docs/` are rendered by the app itself from preset states (`make screenshots`, needs `cwebp` from `brew install webp`). `make snapshot` renders every state, light and dark, to `.build/snapshots/`.
+The screenshots in `docs/` are rendered by the app itself from preset states (`make screenshots`). `make snapshot` renders every state, light and dark, to `.build/snapshots/`.
+
+### Signing certificate
+
+Cappucino isn't signed with an Apple Developer ID. Without a certificate, `make bundle` signs it ad hoc, and an ad-hoc signature is different for every build, so macOS sees each rebuild as a new app. A self-signed certificate gives every build the same identity.
+
+`make signing-cert` runs [`scripts/create-signing-cert.sh`](scripts/create-signing-cert.sh), which:
+
+1. creates a self-signed certificate named "Local App Signing" with `openssl`, valid for 10 years and limited to code signing,
+2. imports it with its private key into your login keychain, and lets `codesign` use the key,
+3. trusts it for code signing only (macOS asks for your password).
+
+`make bundle` checks for the identity with `security find-identity -v -p codesigning` and signs with it when it is there; otherwise it signs ad hoc and says so. AI Bar and Nocchi use the same "Local App Signing" identity, so you only create it once. To use a different name, pass it to both targets: `make signing-cert SIGNING_IDENTITY="My Signing"` and `make bundle SIGNING_IDENTITY="My Signing"`. On the first signed build, macOS may ask whether `codesign` may use the key: click **Always Allow**. To remove the certificate, delete "Local App Signing" (certificate and key) in Keychain Access.
+
+The app isn't notarized. A copy you build yourself opens normally. If you copy it to another Mac, Gatekeeper blocks it the first time: click **Open Anyway** in System Settings → Privacy & Security, or run `xattr -dr com.apple.quarantine /Applications/Cappucino.app`.
 
 ## How It Works
 
