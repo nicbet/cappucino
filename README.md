@@ -38,8 +38,8 @@ There are no prebuilt downloads: you build Cappucino from source. You don't need
 ```bash
 git clone https://github.com/nicbet/cappucino.git
 cd cappucino
-make signing-cert   # once: create a local code-signing certificate (see below)
-make install        # build the release app and copy it to /Applications
+make signing-cert   # 1. once: create your local signing certificate (see below)
+make install        # 2. build the release app and install it in /Applications
 ```
 
 The other tasks:
