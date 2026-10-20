@@ -7,7 +7,9 @@ BUILD_DIR := .build/release
 # Sign with the local certificate from `make signing-cert` when it is in the keychain, otherwise ad hoc.
 SIGNING_IDENTITY ?= Local App Signing
 SIGN_WITH := $(shell security find-identity -v -p codesigning 2>/dev/null | grep -q '"$(SIGNING_IDENTITY)"' && echo '$(SIGNING_IDENTITY)' || echo -)
-ICON_DIR := .build/icon
+# Absolute: actool hands the work to a long-lived helper that resolves relative paths against
+# its own working directory, which may be another checkout.
+ICON_DIR := $(CURDIR)/.build/icon
 
 build:
 	swift build -c release
@@ -17,7 +19,7 @@ build:
 icon:
 	rm -rf "$(ICON_DIR)"
 	mkdir -p "$(ICON_DIR)"
-	xcrun actool Resources/AppIcon.icon --compile "$(ICON_DIR)" \
+	xcrun actool "$(CURDIR)/Resources/AppIcon.icon" --compile "$(ICON_DIR)" \
 		--app-icon AppIcon --platform macosx --target-device mac \
 		--minimum-deployment-target 14.0 --enable-on-demand-resources NO \
 		--development-region en --output-partial-info-plist "$(ICON_DIR)/partial.plist" \
